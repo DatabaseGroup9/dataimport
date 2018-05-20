@@ -1,0 +1,25 @@
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/books.csv" AS row
+MERGE (:Book {id: row.bookID, title: row.title, short_title: row.title});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/authors.csv" AS row
+MERGE (:Author {id: row.authorID, name: row.fullName, firstName: row.firstName, surName: row.surName});
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cities.csv" AS row
+MERGE (:City {id: row.cityID, name: row.name, lat: row.lat,  lon: row.lon});
+
+USING PERIODIC COMMIT 
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/wrote.csv" AS row
+MATCH (b:Book {id: row.bookID}), 
+                      (a:Author {id:row.authorID})
+CREATE (a)-[:AUTHORED]->(b);
+
+
+
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/mentioned.csv" AS row
+MATCH (b:Book {id: row.bookID }), 
+                      (c:City {id: row.cityID})
+CREATE (b)-[:MENTIONS {mentions: row.count}]->(c);
