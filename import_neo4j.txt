@@ -1,3 +1,23 @@
+
+	
+docker run \
+-d --name neo4j \
+--rm \
+-v $(pwd):/data/databases \
+--publish=7474:7474 \
+--publish=7687:7687 \
+--env NEO4J_AUTH=neo4j/class \
+	--env=NEO4J_dbms_memory_pagecache_size=28G \
+	--env=NEO4J_dbms_memory_heap_initial__size=28G \
+	--env=NEO4J_dbms_memory_heap_max__size=28G \
+neo4j
+
+
+-v $(pwd):/data/databases
+
+
+
+
 USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/books.csv" AS row
 MERGE (:Book {id: row.bookID, title: row.title, short_title: row.title});
@@ -6,6 +26,8 @@ USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/authors.csv" AS row
 MERGE (:Author {id: row.authorID, name: row.fullName, firstName: row.firstName, surName: row.surName});
 
+MATCH (n:City { name: 'UNKNOWN' })
+DELETE n
 USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cities.csv" AS row
 MERGE (:City {id: row.cityID, name: row.name, lat: row.lat,  lon: row.lon});
