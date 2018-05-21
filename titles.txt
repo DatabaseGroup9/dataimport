@@ -1,0 +1,12 @@
+AUTHOR
+authorID,fullName,firstName,surName,title
+BOOKS
+bookID,title
+CITIES
+cityID,name,lat,lon
+MENTIONED
+bookID,cityID,count
+WROTE
+authorID,bookID
+
+
