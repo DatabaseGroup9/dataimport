@@ -9,4 +9,5 @@ bookID,cityID,count
 WROTE
 authorID,bookID
 
+sed -i '1d' filename
 
