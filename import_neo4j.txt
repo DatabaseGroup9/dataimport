@@ -1,3 +1,25 @@
+
+CREATE INDEX ON :City(lat)
+CREATE INDEX ON :City(lon)
+CREATE INDEX ON :City(name)
+CREATE INDEX ON :City(Cityid)
+CREATE INDEX ON :Book(Bookid)
+CREATE INDEX ON :Book(title)
+CREATE INDEX ON :Book(id)
+CREATE INDEX ON :Author(Authorid)
+CREATE INDEX ON :Author(name)
+CREATE INDEX ON :Author(firstName)
+CREATE INDEX ON :Author(surName)
+
+
+CREATE INDEX ON :AUTHORED(n)
+CREATE INDEX ON :MENTIONS(n)
+CALL db.indexes()
+
+#authorID,bookID
+#cityID,name,lat,lon
+#authorID,fullName,firstName,surName,title
+#bookID,cityID,count
 Import 1:
 wget -O - https://bit.ly/docker-install | bash
 
@@ -13,7 +35,7 @@ wget https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cities.c
 wget https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/wrote.csv
 wget https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/mentioned.csv
 
-sed -i -E '1s/.*/:ID,title,short_title/' books.csv
+sed -i -E '1s/.*/:ID,title/' books.csv
 sed -i -E '1s/.*/:ID,fullName,firstName,surName,title/' authors.csv
 sed -i -E '1s/.*/:ID,name,lat,lon/' cities.csv
 sed -i -E '1s/.*/:ID,:ID/' wrote.csv
@@ -25,10 +47,7 @@ head -1 cities.csv
 head -1 mentioned.csv
 
 
-#authorID,bookID
-#cityID,name,lat,lon
-#authorID,fullName,firstName,surName,title
-#bookID,cityID,count
+
 
 
 
@@ -104,37 +123,54 @@ docker run \
 neo4j
 
 Test scripts
+MATCH (b:Book)-[r:MENTIONS ]-(c:City) WHERE toLower(c.name)  =~ toLower('.*Madrid.*') RETURN b
+MATCH (b:Book)-[r:MENTIONS ]-(c:City) WHERE toLower(c.name)  =~ toLower('.*Madrid*.') RETURN b
 MATCH (b:Book)-[r:MENTIONS ]-(c:City) WHERE LOWER(c.name) = LOWER($cityName) RETURN b
+
+
 MATCH (b:Book)-[r:MENTIONS]->(c:City) WHERE LOWER(b.title) = LOWER($bookTitle) RETURN c
 
-MATCH (a:Author)-[r:AUTHORED ]-(b:Book) WHERE LOWER(a.name) = LOWER($authorName) RETURN b
+MATCH (b:Book)-[r:MENTIONS]->(c:City) WHERE LOWER(b.title) = LOWER($bookTitle) RETURN c
+MATCH (b:Book)-[r:MENTIONS]->(c:City) WHERE LOWER(" Account of the Romansh Language|In a Letter to Sir John Pringle") = LOWER($bookTitle) RETURN c
 
+MATCH (b:Book)-[r:MENTIONS]->(c:City) WHERE b.title =~  toLower(" Account of the Romansh Language|In a Letter to Sir John Pringle")  RETURN c
+
+
+
+MATCH (a:Author)-[r:AUTHORED ]-(b:Book) WHERE a.name = $authorName RETURN b
+MATCH (a:Author)-[r:AUTHORED ]-(b:Book) WHERE a.name = "Hugo" RETURN b
+
+MATCH (a:Author)-[r:AUTHORED ]-(b:Book) WHERE a.name =~ '.*Hugo.*' RETURN b,r,a
 
 
 USING PERIODIC COMMIT
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/books.csv" AS row
-MERGE (:Book {id: row.bookID, title: row.title, short_title: row.title});
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cleanCsv/books.csv" AS row
+MERGE (:Book {bookID: row.bookID, bookTitle: row.title, bookShortTitle: row.short_title});
+
+
+authorID,fullName,firstName,surName,title
+USING PERIODIC COMMIT
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cleanCsv/authors_cleaned.csv" AS row
+MERGE (:Author {authorID: row.authorID, fullName: row.fullName});
+
 
 USING PERIODIC COMMIT
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/authors.csv" AS row
-MERGE (:Author {id: row.authorID, name: row.fullName, firstName: row.firstName, surName: row.surName});
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cleanCsv/cities_cleaned.csv" AS row
+MERGE (:City {cityID: row.cityID, name: row.name, lat: row.lat,  lon: row.lon});
 
-MATCH (n:City { name: 'UNKNOWN' })
-DELETE n
-USING PERIODIC COMMIT
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cities.csv" AS row
-MERGE (:City {id: row.cityID, name: row.name, lat: row.lat,  lon: row.lon});
+CREATE INDEX ON :Book(bookID)
+CREATE INDEX ON :City(cityID)
+
 
 USING PERIODIC COMMIT 
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/wrote.csv" AS row
-MATCH (b:Book {id: row.bookID}), 
-                      (a:Author {id:row.authorID})
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cleanCsv/wrote.csv" AS row
+MATCH (b:Book {bookID: toString(row.bookID)}), 
+                      (a:Author {authorID :toString(row.authorID)})
 CREATE (a)-[:AUTHORED]->(b);
 
 
 
 USING PERIODIC COMMIT
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/mentioned.csv" AS row
-MATCH (b:Book {id: row.bookID }), 
-                      (c:City {id: row.cityID})
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/cleanCsv/mentioned.csv" AS row
+MATCH (b:Book {bookID: replace(toString(row.bookID), " ", "") }),(c:City {cityID: replace(toString(row.cityID), " ", "")})
 CREATE (b)-[:MENTIONS {mentions: row.count}]->(c);
