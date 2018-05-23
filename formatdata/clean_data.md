@@ -19,7 +19,8 @@ cd unzipped ```
 
 #### run the following commands
 
-*Add prefix to authors because the ids will not be unique otherwise.*
+*Add prefix to authors because the ids will not be unique otherwise. 
+All bash commands has been generated with generate_bash_commands.py*
 
 
 ```sed 's/^/a/' ./data0-500.zip/authors.csv | tail -n +2 >> fullauthors.csv
