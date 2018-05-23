@@ -22,8 +22,7 @@ cd unzipped ```
 *Add prefix to authors because the ids will not be unique otherwise.*
 
 
-```
-sed 's/^/a/' ./data0-500.zip/authors.csv | tail -n +2 >> fullauthors.csv
+```sed 's/^/a/' ./data0-500.zip/authors.csv | tail -n +2 >> fullauthors.csv
 sed 's/^/a/' ./data0-500.zip/wrote.csv | tail -n +2 >> fullwrote.csv
 sed 's/^/b/' ./data500-500.zip/authors.csv | tail -n +2 >> fullauthors.csv
 sed 's/^/b/' ./data500-500.zip/wrote.csv | tail -n +2 >> fullwrote.csv
