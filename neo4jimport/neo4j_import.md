@@ -10,7 +10,7 @@ MERGE (:Book {bookID: row.bookID, bookTitle: row.title, bookShortTitle: row.shor
 
 USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/authors_cleaned.csv" AS row
-MERGE (:Author {authorID: row.authorID, fullName: row.fullName});
+MERGE (:Author {authorID: row.authorID, fullName: row.fullName, firstName: row.firstName, surName: row.surName, title: row.title});
 
 
 USING PERIODIC COMMIT
