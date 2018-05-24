@@ -3,7 +3,6 @@
 ##### Import data into Neo4J via the GUI Interface
 
 
-
 ```
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/books_cleaned.csv" AS row
 MERGE (:Book {bookID: row.bookID, bookTitle: row.title, bookShortTitle: row.short_title});
@@ -16,7 +15,7 @@ MERGE (:Author {authorID: row.authorID, fullName: row.fullName});
 
 USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/cities_cleaned.csv" AS row
-MERGE (:City {cityID: row.cityID, name: row.name, lat: row.lat,  lon: row.lon});
+MERGE (:City {cityID: row.cityID, name: row.name, location: point({longitude: row.lon, latitude: row.lat})});
 
 CREATE INDEX ON :Book(bookID)
 CREATE INDEX ON :City(cityID)
