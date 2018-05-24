@@ -4,8 +4,10 @@ import numpy as np
 
 def cleanCSV():
 	df_authors = pd.read_csv('fullauthors_pre.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['authorID','fullName','firstName','surName','title'],skiprows=1)
-	df_books = pd.read_csv('books_cleaned.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['bookID','title','short_title'],skiprows=1)
+	df_books = pd.read_csv('books_tmp.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['bookID','title', 'short-title'],skiprows=1)
 	df_cities = pd.read_csv('fullcities.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['cityID','name','lat', 'lon'],skiprows=1)
+	df_wrote = pd.read_csv('fullwrote_pre.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['authorID','bookID'],skiprows=1)
+	df_mentioned = pd.read_csv('fullmentioned.csv',delimiter=",",quotechar='"',error_bad_lines=False,keep_default_na=False,names=['bookID', 'cityID', 'count'],skiprows=1)
 	
 
 
@@ -33,11 +35,13 @@ def cleanCSV():
 	#df_authors['title'] = df_books['title'].apply(lambda s: fixUnicode(s))
         #df_books['short_title'] = df_books['short_title'].apply(lambda s: fixUnicode(s))
 
-	print(df_cities)
+	print(df_books)
 
 	df_books.to_csv("books_cleaned.csv", sep=",", quotechar='"', encoding="utf-8", index=False)
 	df_authors.to_csv("authors_cleaned.csv", sep=",", quotechar='"', encoding="utf-8", index=False)
 	df_cities.to_csv("cities_cleaned.csv", sep=",", quotechar='"', encoding="utf-8", index=False)
+	df_wrote.to_csv("wrote_cleaned.csv", sep=",", quotechar='"', encoding="utf-8", index=False)
+	df_mentioned.to_csv("mentioned_cleaned.csv", sep=",", quotechar='"', encoding="utf-8", index=False)
 
 def fixUnicode(col):
 	col = col.replace("\\xc9", "É") # hexadecimal
@@ -53,8 +57,7 @@ def fixUnicode(col):
 	col = col.replace("\\u0301", "́́`") # hexadecimal
 	col = col.replace("\\u0142", "ł") # hexadecimal
 	col = col.replace("\\xed", "í") # hexadecimal
-	col = col.replace("\\u2014", "-") # hexadecimal
-
+	col = col.replace("\\u2014", "-") # hexadecim
 	col = col.replace("\\xe8", "è") # hexadecimal
 	col = col.replace("\\xfc", "ü") # hexadecimal
 	col = col.replace("\\xde", "Þ") #     Þ

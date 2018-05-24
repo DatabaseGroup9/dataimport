@@ -5,7 +5,7 @@ import re
 
 def main():
 	inputfile = sys.argv[1]
-	tempfile = "./tmp.csv"
+	tempfile = sys.argv[2]
 
 	w=open(tempfile,"w+")
 	print(tempfile)
