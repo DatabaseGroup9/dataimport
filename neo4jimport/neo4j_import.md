@@ -8,10 +8,11 @@ LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dat
 MERGE (:Book {bookID: row.bookID, bookTitle: row.title, bookShortTitle: row.short_title});
 
 
-USING PERIODIC COMMIT
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/authors_cleaned.csv" AS row
-MERGE (:Author {authorID: row.authorID, fullName: row.fullName, firstName: row.firstName, surName: row.surName, title: row.title});
 
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/authors_cleaned.csv" AS row
+MERGE (a:Author {authorID: row.authorID, fullName: row.fullName, firstName: row.firstName, surName: row.surName })
+ON CREATE SET a.title = row.title
+ON MATCH SET a.title = row.title
 
 USING PERIODIC COMMIT
 LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/DatabaseGroup9/dataimport/master/data/cities_cleaned.csv" AS row
